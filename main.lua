@@ -22,7 +22,7 @@ function love.load()
     gameState = 'RoundActive'
 
     -- Game Mode ('Normal', 'Audio Only')
-    gameMode = 'Audio Only'
+    gameMode = 'Normal'
 
     -- an object to contain our map data
     map = Map()
@@ -48,7 +48,7 @@ function love.load()
     background = love.graphics.newImage('graphics/background.jpg')
 
     -- result screen sound effect
-    resultSound = love.audio.newSource('sounds/results.mp3', 'static')
+    resultSound = love.audio.newSource('sounds/results.mp3', 'stream')
 
     -- makes upscaling look pixel-y instead of blurry
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -217,9 +217,9 @@ function love.draw()
     end    
     
     -- Used for debugging values in real time
-     --love.graphics.print(previousRapper, VIRTUAL_WIDTH / 2 - 50, 20)
-     --love.graphics.print(map.player.nearestRapperNumber, map.player.x + 30, map.player.y - 30)
-     --love.graphics.print(map.player.collided, VIRTUAL_WIDTH / 2 - 50, 60)
+    -- love.graphics.print(previousRapper, VIRTUAL_WIDTH / 2 - 50, 20)
+    -- love.graphics.print(map.player.nearestRapperNumber, map.player.x + 30, map.player.y - 30)
+    -- love.graphics.print(map.player.collided, VIRTUAL_WIDTH / 2 - 50, 60)
        
      -- end virtual resolution
     push:apply('end')

@@ -29,11 +29,6 @@ function Player:init(map)
 
     -- sound effects
     self.sounds = {
-        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
-        ['hit'] = love.audio.newSource('sounds/hit.wav', 'static'),
-        ['coin'] = love.audio.newSource('sounds/coin.wav', 'static'),
-        ['flagdown'] = love.audio.newSource('sounds/flagdown.wav', 'static'),
-        ['dead'] = love.audio.newSource('sounds/dead.wav', 'static'),
         ['correct'] = love.audio.newSource('sounds/correct.mp3', 'static'),
         ['wrong'] = love.audio.newSource('sounds/wrong.wav', 'static')
     }
