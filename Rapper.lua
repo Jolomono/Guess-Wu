@@ -47,14 +47,11 @@ function Rapper:init(map, name, number)
     -- number of verses in the rapper's audio table
     self.total_verses = table.getn(self.audio)
 
-    -- texture file to use in audio only mode (doesn't waste time with this if the mode isn't Audio Only)
-    if gameMode == 'Audio Only'  then
-        self.hiddentexture = love.graphics.newImage('graphics/hidden.png')
-        self.hiddenselectedtexture = love.graphics.newImage('graphics/hidden2.png')
-    end
-
+    self.hiddentexture = love.graphics.newImage('graphics/hidden.png')
+    self.hiddenselectedtexture = love.graphics.newImage('graphics/hidden2.png')
+    
     -- font 
-    nameplatefont = love.graphics.newFont("/fonts/amsterdam.ttf", 44)
+    nameplatefont = love.graphics.newFont("/fonts/shiny eyes.otf", 44)
     
 end
 
@@ -150,7 +147,6 @@ end
 function Rapper:render()
     love.graphics.setFont(nameplatefont)
     love.graphics.printf(self.nameplate, self.x - 50, self.y + self.height, self.width + 100, "center")
-
     
     -- determines what to draw to the screen for each rapper based on the status
     -- if the rapper is revealed their picture should show up in Audio Only mode or Normal mode

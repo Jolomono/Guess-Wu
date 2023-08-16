@@ -350,4 +350,3 @@ function Player:render()
         -- origin point for sprite
         self.width / 2, self.height / 2)
 end
-

@@ -29,6 +29,8 @@ function Map:init()
 
     -- create a table to store rappers
     self.Rappers = {}
+
+    self.frozen = false 
         
     self:createNameList()
 
@@ -82,7 +84,9 @@ function Map:update(dt)
         math.min(self.player.y - VIRTUAL_HEIGHT / 2, 
         math.min(self.mapHeightPixels - VIRTUAL_HEIGHT, self.player.y))))
 
-    self.player:update(dt)
+    if self.frozen == false then 
+        self.player:update(dt)
+    end 
 
     for _, rapper in ipairs(self.Rappers) do 
         rapper:update(self.player.nearestRapperNumber)
