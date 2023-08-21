@@ -21,7 +21,9 @@ function Player:init(map)
     self.dx = 0
     self.dy = 0
 
-    self.nearestRapperNumber = 1
+    self.nearestRapper = nil
+
+    self.currently_playing = nil 
 
     self.currentTrack = nil
 
@@ -65,7 +67,8 @@ function Player:init(map)
     self.behaviors = {
         ['idle'] = function()
             if love.keyboard.wasPressed('space') then
-                self:playAudio(self.nearestRapperNumber)
+                self:playAudio(self.nearestRapper)
+                self:set_currently_playing(self.nearestRapper)
             -- move up/left 
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('a') then
                 self.dx = -MOVE_SPEED
@@ -127,7 +130,8 @@ function Player:init(map)
         end, 
         ['walking'] = function()
             if love.keyboard.wasPressed('space') then
-                self:playAudio(self.nearestRapperNumber)
+                self:playAudio(self.nearestRapper)
+                self:set_currently_playing(self.nearestRapper)
             -- move up/left 
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('a') then
                 self.dx = -MOVE_SPEED
@@ -202,10 +206,10 @@ function Player:init(map)
 end
 
 function Player:getNearestCollisionCoords()
-    rapperL = self.map.Rappers[self.nearestRapperNumber].x - HITBOX_X_OFFSET
-    rapperR = self.map.Rappers[self.nearestRapperNumber].x + self.map.Rappers[self.nearestRapperNumber].width + HITBOX_X_OFFSET
-    rapperTop = self.map.Rappers[self.nearestRapperNumber].y - HITBOX_Y_OFFSET
-    rapperBot = self.map.Rappers[self.nearestRapperNumber].y + self.map.Rappers[self.nearestRapperNumber].height + HITBOX_Y_OFFSET
+    rapperL = self.nearestRapper.x - HITBOX_X_OFFSET
+    rapperR = self.nearestRapper.x + self.nearestRapper.width + HITBOX_X_OFFSET
+    rapperTop = self.nearestRapper.y - HITBOX_Y_OFFSET
+    rapperBot = self.nearestRapper.y + self.nearestRapper.height + HITBOX_Y_OFFSET
 end
 
 -- returns true if we've hit a rapper, false otherwise
@@ -221,8 +225,8 @@ function Player:rapperCollision()
     end
 
     -- if this is the first time we've touched a rapper then reveal it
-    if self.map.Rappers[self.nearestRapperNumber].status == 'hidden' then
-        self.map.Rappers[self.nearestRapperNumber]:touched(self.attempts)
+    if self.nearestRapper.status == 'hidden' then
+        self.nearestRapper:touched(self.attempts)
         self.attempts = self.attempts + 1
     end
 
@@ -300,8 +304,9 @@ function Player:checkDownCollision()
 end
 
 -- returns the number of nearest rapper to the player
-function Player:nearestRapper()
-    local nearestRapper = nil 
+-- updated to return the Rapper Object itself
+function Player:findNearestRapper()
+    local nearestRapper = nil
     local distance = nil
     for i = 1, table.getn(self.map.Rappers) do
         local current_distance = distanceFrom(self.x, self.y, self.map.Rappers[i].middlex, self.map.Rappers[i].middley)
@@ -313,16 +318,16 @@ function Player:nearestRapper()
             nearestRapper = self.map.Rappers[i]
         end
     end
-    return nearestRapper.number
+    return nearestRapper
 end
 
 -- plays an audio track corresponding to the nearest rapper
 -- will not play the last track played (or currently playing track)
 function Player:playAudio(rapper)
     love.audio.stop()
-    newTrack = map.Rappers[rapper].audio[math.random(map.Rappers[rapper].total_verses)]
+    newTrack = rapper.audio[math.random(rapper.total_verses)]
     while newTrack == self.currentTrack do
-        newTrack = map.Rappers[rapper].audio[math.random(map.Rappers[rapper].total_verses)]
+        newTrack = rapper.audio[math.random(rapper.total_verses)]
     end
     self.currentTrack = newTrack
     self.currentTrack:play()
@@ -334,7 +339,7 @@ function Player:update(dt)
     self.x = self.x + self.dx * dt
     self.y = self.y + self.dy * dt
 
-    self.nearestRapperNumber = self:nearestRapper()
+    self.nearestRapper = self:findNearestRapper()
 end
 
 function Player:render()
@@ -350,3 +355,16 @@ function Player:render()
         -- origin point for sprite
         self.width / 2, self.height / 2)
 end
+
+function Player:set_currently_playing(rapper)
+    -- if no track is currently playing, set rapper.playing to true 
+    -- if a track is playing, currently playing will not equal nil
+    -- First, set currently_playing rapper to false
+    -- next, update currently playing to rapper
+    -- then set rapper to.playing to true
+    if self.currently_playing ~= nil then
+        self.currently_playing:stop_playing()
+    end 
+    self.currently_playing = rapper 
+    rapper:start_playing()
+end 

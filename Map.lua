@@ -89,7 +89,7 @@ function Map:update(dt)
     end 
 
     for _, rapper in ipairs(self.Rappers) do 
-        rapper:update(self.player.nearestRapperNumber)
+        rapper:update()
     end 
 end
 

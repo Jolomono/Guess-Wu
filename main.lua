@@ -326,4 +326,3 @@ function swap_mode(current_mode)
         return "Normal"
     end 
 end 
-

@@ -1,5 +1,9 @@
 Rapper = Class{}
 
+AUDIO_ICON = love.graphics.newImage('graphics/now_playing.png')
+HIDDEN_TEXTURE = love.graphics.newImage('graphics/hidden.png')
+HIDDEN_SELECTED_TEXTURE = love.graphics.newImage('graphics/hidden2.png')
+
 function Rapper:init(map, name, number)
     -- name
     self.name = name
@@ -17,7 +21,11 @@ function Rapper:init(map, name, number)
     self.width = 150
     self.height = 150
 
+    -- Is this rapper nearest to the player?
     self.selected = false
+
+    -- Is this rapper currently playing audio?
+    self.playing = false 
 
     -- location for sprite
     if self.number == 1 then
@@ -46,9 +54,6 @@ function Rapper:init(map, name, number)
     
     -- number of verses in the rapper's audio table
     self.total_verses = table.getn(self.audio)
-
-    self.hiddentexture = love.graphics.newImage('graphics/hidden.png')
-    self.hiddenselectedtexture = love.graphics.newImage('graphics/hidden2.png')
     
     -- font 
     nameplatefont = love.graphics.newFont("/fonts/shiny eyes.otf", 44)
@@ -132,21 +137,26 @@ function Rapper:touched(attempt)
     
 end
 
-function Rapper:update(number)
+function Rapper:update()
     if self.status == 'revealed' then
         self.nameplate = self.name
     end
 
-    if number == self.number then
-        self.selected = true 
+    if map.player.nearestRapper == self then
+         self.selected = true 
     else
-        self.selected = false
+         self.selected = false
     end
 end
 
 function Rapper:render()
     love.graphics.setFont(nameplatefont)
     love.graphics.printf(self.nameplate, self.x - 50, self.y + self.height, self.width + 100, "center")
+
+    if self.playing == true then 
+        love.graphics.draw(AUDIO_ICON, self.x + self.width + 10, self.y + 50, 0, 0.1, 0.1)
+        love.graphics.draw(AUDIO_ICON, self.x - 10, self.y + 50, 0, -0.1, 0.1)
+    end 
     
     -- determines what to draw to the screen for each rapper based on the status
     -- if the rapper is revealed their picture should show up in Audio Only mode or Normal mode
@@ -159,9 +169,17 @@ function Rapper:render()
     -- if the game mode isn't normal (and thus it's in 'Audio Only' mode) and the rapper hasn't been revealed then use the hidden textures for each rapper
     else 
         if self.selected then
-            love.graphics.draw(self.hiddenselectedtexture, self.x, self.y, 0, 1, 1)
+            love.graphics.draw(HIDDEN_SELECTED_TEXTURE, self.x, self.y, 0, 1, 1)
         else
-            love.graphics.draw(self.hiddentexture, self.x, self.y, 0, 1, 1)
+            love.graphics.draw(HIDDEN_TEXTURE, self.x, self.y, 0, 1, 1)
         end    
     end
 end
+
+function Rapper:stop_playing()
+    self.playing = false
+end 
+
+function Rapper:start_playing()
+    self.playing = true
+end 
