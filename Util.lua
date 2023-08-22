@@ -30,3 +30,11 @@ end
 function colorLtBlue()
     love.graphics.setColor(127/255, 223/255, 255/255)
 end
+
+function make_image(filename)
+    return love.graphics.newImage(filename)
+end 
+
+function make_audio(filename)
+    return love.audio.newSource(filename,'stream')
+end 

@@ -1,8 +1,47 @@
 Rapper = Class{}
 
-AUDIO_ICON = love.graphics.newImage('graphics/now_playing.png')
-HIDDEN_TEXTURE = love.graphics.newImage('graphics/hidden.png')
-HIDDEN_SELECTED_TEXTURE = love.graphics.newImage('graphics/hidden2.png')
+AUDIO_ICON = make_image('graphics/now_playing2.png')
+HIDDEN_TEXTURE = make_image('graphics/hidden.png')
+HIDDEN_SELECTED_TEXTURE = make_image('graphics/hidden2.png')
+
+TEXTURES = { 
+    ["RZA"] = { ["texture"] = make_image('graphics/rza.png'),
+            ["selected"] = make_image('graphics/rza2.png')
+    }, 
+    ["GZA"] = { ["texture"] = make_image('graphics/gza.png'),
+            ["selected"] = make_image('graphics/gza2.png')
+    },
+    ["Ghostface Killah"] = { ["texture"] = make_image('graphics/ghostface.png'),
+            ["selected"] = make_image('graphics/ghostface2.png')
+    },
+    ["Method Man"] = { ["texture"] = make_image('graphics/methodman.png'),
+            ["selected"] = make_image('graphics/methodman2.png')
+    },
+    ["Ol' Dirty Bastard"] = { ["texture"] = make_image('graphics/odb.png'),
+            ["selected"] = make_image('graphics/odb2.png')
+    },
+    ["Raekwon"] = { ["texture"] = make_image('graphics/raekwon.png'),
+            ["selected"] = make_image('graphics/raekwon2.png')
+    },
+    ["Inspectah Deck"] = { ["texture"] = make_image('graphics/inspectahdeck.png'),
+            ["selected"] = make_image('graphics/inspectahdeck2.png')
+    },
+    ["U-God"] = { ["texture"] = make_image('graphics/u-god.png'),
+            ["selected"] = make_image('graphics/u-god2.png')
+    },
+    ["Masta Killa"] = { ["texture"] = make_image('graphics/mastakilla.png'),
+            ["selected"] = make_image('graphics/mastakilla2.png')
+    },
+    ["Cappadonna"] = { ["texture"] = make_image('graphics/cappadonna.png'),
+            ["selected"] = make_image('graphics/cappadonna2.png')
+    },
+    ["David Lee Roth"] = { ["texture"] = make_image('graphics/davidleeroth.png'),
+            ["selected"] = make_image('graphics/davidleeroth2.png')
+    },
+    ["Paul Stanley"] = { ["texture"] = make_image('graphics/paulstanley.png'),
+            ["selected"] = make_image('graphics/paulstanley2.png')
+    }
+}
 
 function Rapper:init(map, name, number)
     -- name
@@ -46,7 +85,8 @@ function Rapper:init(map, name, number)
     self.middley = self.y + self.height / 2
     
     -- texture file setup
-    self:setupTexture(self.name)
+    self.texture = TEXTURES[name]["texture"]
+    self.selectedtexture = TEXTURES[name]["selected"]
 
     -- verses audio table setup
     -- this is on a separate file because of how many audio files there are
@@ -58,47 +98,6 @@ function Rapper:init(map, name, number)
     -- font 
     nameplatefont = love.graphics.newFont("/fonts/shiny eyes.otf", 44)
     
-end
-
--- sets up the texture file to use for each rapper
-function Rapper:setupTexture(name)
-    if name == 'RZA' then
-        self.texture = love.graphics.newImage('graphics/rza.png')
-        self.selectedtexture = love.graphics.newImage('graphics/rza2.png')
-    elseif name == 'GZA' then
-        self.texture = love.graphics.newImage('graphics/gza.png')
-        self.selectedtexture = love.graphics.newImage('graphics/gza2.png')
-    elseif name == 'Ghostface Killah' then
-        self.texture = love.graphics.newImage('graphics/ghostface.png')
-        self.selectedtexture = love.graphics.newImage('graphics/ghostface2.png')
-    elseif name == 'Method Man' then
-        self.texture = love.graphics.newImage('graphics/methodman.png')
-        self.selectedtexture = love.graphics.newImage('graphics/methodman2.png')
-    elseif name == "Ol' Dirty Bastard" then
-        self.texture = love.graphics.newImage('graphics/odb.png')
-        self.selectedtexture = love.graphics.newImage('graphics/odb2.png')
-    elseif name == 'Raekwon' then
-        self.texture = love.graphics.newImage('graphics/raekwon.png')
-        self.selectedtexture = love.graphics.newImage('graphics/raekwon2.png')
-    elseif name == 'Inspectah Deck' then
-        self.texture = love.graphics.newImage('graphics/inspectahdeck.png')
-        self.selectedtexture = love.graphics.newImage('graphics/inspectahdeck2.png')
-    elseif name == 'U-God' then
-        self.texture = love.graphics.newImage('graphics/u-god.png')
-        self.selectedtexture = love.graphics.newImage('graphics/u-god2.png')
-    elseif name == 'Masta Killa' then
-        self.texture = love.graphics.newImage('graphics/mastakilla.png')
-        self.selectedtexture = love.graphics.newImage('graphics/mastakilla2.png')
-    elseif name == 'Cappadonna' then
-        self.texture = love.graphics.newImage('graphics/cappadonna.png')
-        self.selectedtexture = love.graphics.newImage('graphics/cappadonna2.png')
-    elseif name == 'David Lee Roth' then
-        self.texture = love.graphics.newImage('graphics/davidleeroth.png')
-        self.selectedtexture = love.graphics.newImage('graphics/davidleeroth2.png')
-    elseif name == 'Paul Stanley' then
-        self.texture = love.graphics.newImage('graphics/paulstanley.png')
-        self.selectedtexture = love.graphics.newImage('graphics/paulstanley2.png')
-    end
 end
 
 -- if a rapper has been touched, change status to 'revealed'
@@ -154,8 +153,8 @@ function Rapper:render()
     love.graphics.printf(self.nameplate, self.x - 50, self.y + self.height, self.width + 100, "center")
 
     if self.playing == true then 
-        love.graphics.draw(AUDIO_ICON, self.x + self.width + 10, self.y + 50, 0, 0.1, 0.1)
-        love.graphics.draw(AUDIO_ICON, self.x - 10, self.y + 50, 0, -0.1, 0.1)
+        love.graphics.draw(AUDIO_ICON, self.x + self.width + 10, self.y + 50, 0, 1, 1)
+        love.graphics.draw(AUDIO_ICON, self.x - 10, self.y + 50, 0, -1, 1)
     end 
     
     -- determines what to draw to the screen for each rapper based on the status

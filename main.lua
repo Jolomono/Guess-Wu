@@ -58,7 +58,7 @@ function love.load()
     howtoplayfont = love.graphics.newFont('/fonts/unispace it.otf', 25)
 
     -- background image
-    background = love.graphics.newImage('graphics/background.jpg')
+    background = make_image('graphics/background.jpg')
 
     -- result screen sound effect
     resultSound = love.audio.newSource('sounds/results.mp3', 'stream')

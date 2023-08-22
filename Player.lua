@@ -35,7 +35,7 @@ function Player:init(map)
         ['wrong'] = love.audio.newSource('sounds/wrong.wav', 'static')
     }
 
-    self.texture = love.graphics.newImage('graphics/blue_alien.png')
+    self.texture = make_image('graphics/blue_alien.png')
     self.frames = generateQuads(self.texture, 16, 20)
 
     self.victory = false
@@ -356,12 +356,10 @@ function Player:render()
         self.width / 2, self.height / 2)
 end
 
+-- calls rapper:stop_playing on whichever is currently playing
+-- updates the currently playing rapper
+-- this updates the rapper 'playing' status to show or not show the now playing icon
 function Player:set_currently_playing(rapper)
-    -- if no track is currently playing, set rapper.playing to true 
-    -- if a track is playing, currently playing will not equal nil
-    -- First, set currently_playing rapper to false
-    -- next, update currently playing to rapper
-    -- then set rapper to.playing to true
     if self.currently_playing ~= nil then
         self.currently_playing:stop_playing()
     end 
