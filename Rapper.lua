@@ -152,7 +152,7 @@ function Rapper:render()
     love.graphics.setFont(nameplatefont)
     love.graphics.printf(self.nameplate, self.x - 50, self.y + self.height, self.width + 100, "center")
 
-    if self.playing == true then 
+    if self.playing then 
         love.graphics.draw(AUDIO_ICON, self.x + self.width + 10, self.y + 50, 0, 1, 1)
         love.graphics.draw(AUDIO_ICON, self.x - 10, self.y + 50, 0, -1, 1)
     end 

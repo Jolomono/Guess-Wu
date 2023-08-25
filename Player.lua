@@ -4,9 +4,8 @@ require 'Animation'
 require 'Util'
 
 local MOVE_SPEED = 600
-
-local PLAYER_UPSCALE = 2.8
-local HITBOX_X_OFFSET = 16
+local PLAYER_UPSCALE = 3
+local HITBOX_X_OFFSET = 14
 local HITBOX_Y_OFFSET = 18
 
 function Player:init(map)
@@ -43,8 +42,6 @@ function Player:init(map)
     self.state = 'idle'
     self.direction = 'right'
 
-    self.collided = "false"
-
     self.animations = {
         ['idle'] = Animation {
             texture = self.texture,
@@ -66,66 +63,19 @@ function Player:init(map)
 
     self.behaviors = {
         ['idle'] = function()
+            -- play audio
             if love.keyboard.wasPressed('space') then
                 self:playAudio(self.nearestRapper)
                 self:set_currently_playing(self.nearestRapper)
-            -- move up/left 
-            elseif love.keyboard.isDown('w') and love.keyboard.isDown('a') then
-                self.dx = -MOVE_SPEED
-                self.dy = -MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-                self.direction = 'left'
-            -- move up/right
-            elseif love.keyboard.isDown('w') and love.keyboard.isDown('d') then
-                self.dx = MOVE_SPEED
-                self.dy = -MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-                self.direction = 'right'
-            -- move down/left
-            elseif love.keyboard.isDown('s') and love.keyboard.isDown('a') then
-                self.dx = -MOVE_SPEED
-                self.dy = MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-                self.direction = 'left'
-            -- move down/right
-            elseif love.keyboard.isDown('s') and love.keyboard.isDown('d') then
-                self.dx = MOVE_SPEED
-                self.dy = MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-                self.direction = 'right'
-            elseif love.keyboard.isDown('a') then
-                self.dx = -MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-                self.direction = 'left'
-            elseif love.keyboard.isDown('d') then
-                self.dx = MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-                self.direction = 'right'
-            elseif love.keyboard.isDown('w') then
-                self.dy = -MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-            elseif love.keyboard.isDown('s') then
-                self.dy = MOVE_SPEED
-                self.state = 'walking'
-                self.animations['walking']:restart()
-                self.animation = self.animations['walking']
-            else
-                self.dx = 0
-                self.dy = 0
+            end 
+            
+            -- if any movement key is pressed, start moving
+            for _, key in ipairs({'a', 's', 'd', 'w'}) do 
+                if love.keyboard.wasPressed(key) then 
+                    self.state = 'walking'
+                    self.animations['walking']:restart()
+                    self.animation = self.animations['walking']
+                end 
             end
         end, 
         ['walking'] = function()
@@ -134,76 +84,55 @@ function Player:init(map)
                 self:set_currently_playing(self.nearestRapper)
             -- move up/left 
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('a') then
-                self.dx = -MOVE_SPEED
-                self.dy = -MOVE_SPEED
-                self.direction = 'left'
+                self:moveUp()
+                self:moveLeft()
             -- move up/right
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('d') then
-                self.dx = MOVE_SPEED
-                self.dy = -MOVE_SPEED
-                self.direction = 'right'
+                self:moveUp()
+                self:moveRight()
             -- move down/left
             elseif love.keyboard.isDown('s') and love.keyboard.isDown('a') then
-                self.dx = -MOVE_SPEED
-                self.dy = MOVE_SPEED
-                self.direction = 'left'
+                self:moveDown()
+                self:moveLeft()
             -- move down/right
             elseif love.keyboard.isDown('s') and love.keyboard.isDown('d') then
-                self.dx = MOVE_SPEED
-                self.dy = MOVE_SPEED
-                self.direction = 'right'
+                self:moveDown()
+                self:moveRight()
             elseif love.keyboard.isDown('a') then
-                self.dx = -MOVE_SPEED
-                self.direction = 'left'
+                self:moveLeft()
             elseif love.keyboard.isDown('d') then
-                self.dx = MOVE_SPEED
-                self.direction = 'right'
+                self:moveRight()
             elseif love.keyboard.isDown('w') then
-                self.dy = -MOVE_SPEED
+                self:moveUp()
             elseif love.keyboard.isDown('s') then
-                self.dy = MOVE_SPEED
+                self:moveDown()
             else
                 self.state = 'idle'
                 self.animation = self.animations['idle']
                 self.dx = 0
                 self.dy = 0
             end 
-
-            -- collision coordinates
-            self:getNearestCollisionCoords()
-            
-            -- if we're moving right
-            if self.dx > 0  and self.dy == 0 then
-                self:checkRightCollision()
-            -- if we're moving left
-            elseif self.dx < 0 and self.dy == 0 then
-                self:checkLeftCollision()
-            -- if we're moving up
-            elseif self.dx == 0 and self.dy < 0 then
-                self:checkUpCollision()
-            -- if we're moving down
-            elseif self.dx == 0 and self.dy > 0 then
-                self:checkDownCollision()      
-            -- if we're moving up/right
-            elseif self.dx > 0 and self.dy < 0 then
-                self:checkUpCollision()
-                self:checkRightCollision()
-            -- if we're moving down/right
-            elseif self.dx > 0 and self.dy > 0 then
-                self:checkDownCollision()
-                self:checkRightCollision()
-            -- if we're moving up/left
-            elseif self.dx < 0 and self.dy < 0 then
-                self:checkUpCollision()
-                self:checkLeftCollision()
-            -- if we're moving down/left
-            elseif self.dx < 0 and self.dy > 0 then
-                self:checkDownCollision()
-                self:checkLeftCollision()
-            end
         end
     }
 end
+
+function Player:moveUp()
+    self.dy = -MOVE_SPEED
+end 
+
+function Player:moveDown()
+    self.dy = MOVE_SPEED
+end 
+
+function Player:moveRight()
+    self.dx = MOVE_SPEED
+    self.direction = 'right'
+end 
+
+function Player:moveLeft()
+    self.dx = -MOVE_SPEED
+    self.direction = 'left'
+end 
 
 function Player:getNearestCollisionCoords()
     rapperL = self.nearestRapper.x - HITBOX_X_OFFSET
@@ -212,94 +141,59 @@ function Player:getNearestCollisionCoords()
     rapperBot = self.nearestRapper.y + self.nearestRapper.height + HITBOX_Y_OFFSET
 end
 
--- returns true if we've hit a rapper, false otherwise
-function Player:rapperCollision()
-    if self.x > rapperR or 
-        self.x + self.width < rapperL then
-            return false
-    end
-    
-    if self.y > rapperBot or 
-        self.y + self.height < rapperTop then
-            return false
-    end
+function Player:rapperCollision(x, y)
+    self:getNearestCollisionCoords()
+    return  x < rapperR and 
+            x + self.width > rapperL and 
+            y < rapperBot and 
+            y + self.height > rapperTop
+end
 
-    -- if this is the first time we've touched a rapper then reveal it
+function Player:wallCollision(x, y)
+    return  x < HITBOX_X_OFFSET or
+            x + self.width > self.map.mapWidthPixels - HITBOX_X_OFFSET or 
+            y < HITBOX_Y_OFFSET or 
+            y + self.height > self.map.mapHeightPixels - HITBOX_Y_OFFSET
+end
+
+function Player:collision(x, y)
+    return self:wallCollision(x, y) or self:rapperCollision(x, y)
+end
+
+function Player:move(dt)
+    old_x = self.x 
+    old_y = self.y 
+    new_x = self.x + self.dx * dt
+    new_y = self.y + self.dy * dt
+
+    -- is there a collision? 
+    if self:collision(new_x, new_y) then
+        -- if we collided with a rapper, touch them
+        if self:rapperCollision(new_x, new_y) then self:touchRapper() end
+        
+        self.x, self.y = self:get_available_position(old_x, old_y, new_x, new_y)
+    -- no collision, move to new spot
+    else
+        self.x, self.y = new_x, new_y 
+    end 
+end
+
+-- if we can move our position horizontally or vertically only without a collision, return that position
+--  otherwise return the old position
+function Player:get_available_position(old_x, old_y, new_x, new_y)
+    if self:collision(old_x, new_y) == false then 
+        return old_x, new_y
+    elseif self:collision(new_x, old_y) == false then 
+        return new_x, old_y
+    else 
+        return old_x, old_y 
+    end 
+end 
+
+function Player:touchRapper()
     if self.nearestRapper.status == 'hidden' then
         self.nearestRapper:touched(self.attempts)
         self.attempts = self.attempts + 1
-    end
-
-    -- if neither of these returns false then there is a collision
-    return true
-end
-
--- checks to make sure we haven't passed left boundary of map then
--- checks two tiles to our left to see if a collision occurred
-function Player:checkLeftCollision()
-    self:rapperCollision()
-    
-    if self.x <= HITBOX_X_OFFSET then
-        self.x = HITBOX_X_OFFSET
-        self.dx = 0
-    end
-
-    -- if we've collided with a rapper while moving left then put the player on the right edge of that rapper
-    if self.x + self.width > rapperL and self.x <= rapperR and self.y + self.height > rapperTop and self.y < rapperBot then                 
-        -- if so, reset velocity and position and change state
-            self.x = rapperR
-            self.dx = 0
-    end
-    
-end
-
--- checks to make sure we haven't passed right boundary of map then
--- check two tiles to our right to see if a collision occured
-function Player:checkRightCollision()
-    self:rapperCollision()
-
-    if self.x + self.width >= self.map.mapWidthPixels - HITBOX_X_OFFSET then
-        self.x = self.map.mapWidthPixels - self.width - HITBOX_X_OFFSET
-        self.dx = 0
-    end
-    
-    -- if we've collided with a rapper while moving right then put the player on the left edge of that rapper
-    if self.x + self.width >= rapperL and self.x < rapperR and self.y + self.height > rapperTop and self.y < rapperBot then 
-        -- if so, reset velocity and position and change state
-        self.x = rapperL - self.width
-        self.dx = 0
-    end
-end
-
--- check for collisions above the player
-function Player:checkUpCollision()
-    self:rapperCollision()
-
-    if self.y <= HITBOX_Y_OFFSET then
-        self.y = HITBOX_Y_OFFSET
-        self.dy = 0
-    end
-
-    -- if we collide with a rapper while moving up, place the player on the bottom edge of that rapper
-    if self.y <= rapperBot and self.y + self.height > rapperTop and self.x < rapperR and self.x + self.width > rapperL then
-        self.y = rapperBot
-        self.dy = 0
-    end
-end
-
--- check for collisions below the player
-function Player:checkDownCollision()
-    self:rapperCollision()
-
-    if self.y + self.height >= self.map.mapHeightPixels - HITBOX_Y_OFFSET then
-        self.y = self.map.mapHeightPixels - self.height - HITBOX_X_OFFSET
-        self.dy = 0
-    end
-    
-    -- if we collide with a rapper while moving down, place the player on the top edge of that rapper
-    if self.y < rapperBot and self.y + self.height >= rapperTop and self.x < rapperR and self.x + self.width > rapperL then
-        self.y = rapperTop - self.height
-        self.dy = 0
     end
 end
 
@@ -334,12 +228,10 @@ function Player:playAudio(rapper)
 end
 
 function Player:update(dt)
+    self.nearestRapper = self:findNearestRapper()
     self.behaviors[self.state](dt)
     self.animation:update(dt)
-    self.x = self.x + self.dx * dt
-    self.y = self.y + self.dy * dt
-
-    self.nearestRapper = self:findNearestRapper()
+    self:move(dt)
 end
 
 function Player:render()
@@ -365,4 +257,4 @@ function Player:set_currently_playing(rapper)
     end 
     self.currently_playing = rapper 
     rapper:start_playing()
-end 
+end

@@ -181,7 +181,9 @@ function love.draw()
     end
     
     -- Used for debugging values in real time
-    -- love.graphics.print(gameState, VIRTUAL_WIDTH / 2 - 50, 20)
+    -- if gameState ~= "Start" then 
+    --     love.graphics.print(map.player:collision(map.player.x, map.player.y), VIRTUAL_WIDTH / 2 - 50, 20)
+    -- end 
     -- love.graphics.print(map.player.nearestRapperNumber, map.player.x + 30, map.player.y - 30)
     -- love.graphics.print(map.player.collided, VIRTUAL_WIDTH / 2 - 50, 60)
        
@@ -229,7 +231,7 @@ function display_end_of_game_message()
     love.graphics.printf('Press Enter for final results', 0, map.mapHeightPixels / 2 + 32, map.mapWidthPixels, 'center')    
 end 
 
-function display_title_screen()  
+function display_title_screen()
     map.camX = 0
     map.camY = 0
 
@@ -287,9 +289,9 @@ function display_results()
     colorYellow()
     if score < 16 then
         love.graphics.printf("WU TANG TRAINEE", 0, VIRTUAL_HEIGHT / 4 + 60, VIRTUAL_WIDTH, "center")
-    elseif score < 30 then
+    elseif score < 31 then
         love.graphics.printf("WU TANG DISCIPLE", 0, VIRTUAL_HEIGHT / 4 + 60, VIRTUAL_WIDTH, "center")
-    elseif score < 40 then
+    elseif score < 41 then
         love.graphics.printf("WU TANG MONK", 0, VIRTUAL_HEIGHT / 4 + 60, VIRTUAL_WIDTH, "center")
     else
         love.graphics.printf("WU TANG MASTER", 0, VIRTUAL_HEIGHT / 4 + 60, VIRTUAL_WIDTH, "center")
