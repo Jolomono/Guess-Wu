@@ -1,4 +1,4 @@
-function generateQuads(atlas, tilewidth, tileheight)
+function generate_quads(atlas, tilewidth, tileheight)
     local sheetWidth = atlas:getWidth() / tilewidth
     local sheetHeight = atlas:getHeight() / tileheight
 
@@ -15,26 +15,26 @@ function generateQuads(atlas, tilewidth, tileheight)
     return quads
 end
 
-function distanceFrom(x1,y1,x2,y2) 
-    return math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) 
+function distance_from(x1,y1,x2,y2)
+    return math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 end
 
-function colorYellow()
+function color_yellow()
     love.graphics.setColor(255,255,0)
 end
 
-function colorWhite()
+function color_white()
     love.graphics.setColor(255,255,255)
 end
 
-function colorLtBlue()
+function color_lt_blue()
     love.graphics.setColor(127/255, 223/255, 255/255)
 end
 
 function make_image(filename)
     return love.graphics.newImage(filename)
-end 
+end
 
 function make_audio(filename)
     return love.audio.newSource(filename,'stream')
-end 
+end

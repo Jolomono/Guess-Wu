@@ -14,17 +14,17 @@ function Player:init(map)
     self.width = 16
     self.height = 20
 
-    self.x = map.mapWidthPixels / 2
-    self.y = map.mapHeightPixels / 2 - self.height
+    self.x = map.width / 2
+    self.y = map.height / 2 - self.height
 
     self.dx = 0
     self.dy = 0
 
-    self.nearestRapper = nil
+    self.nearest_rapper = nil
 
     self.currently_playing = nil 
 
-    self.currentTrack = nil
+    self.current_track = nil
 
     self.attempts = 1
 
@@ -35,7 +35,7 @@ function Player:init(map)
     }
 
     self.texture = make_image('graphics/blue_alien.png')
-    self.frames = generateQuads(self.texture, 16, 20)
+    self.frames = generate_quads(self.texture, 16, 20)
 
     self.victory = false
     
@@ -65,8 +65,8 @@ function Player:init(map)
         ['idle'] = function()
             -- play audio
             if love.keyboard.wasPressed('space') then
-                self:playAudio(self.nearestRapper)
-                self:set_currently_playing(self.nearestRapper)
+                self:play_audio(self.nearest_rapper)
+                self:set_currently_playing(self.nearest_rapper)
             end 
             
             -- if any movement key is pressed, start moving
@@ -80,32 +80,32 @@ function Player:init(map)
         end, 
         ['walking'] = function()
             if love.keyboard.wasPressed('space') then
-                self:playAudio(self.nearestRapper)
-                self:set_currently_playing(self.nearestRapper)
+                self:play_audio(self.nearest_rapper)
+                self:set_currently_playing(self.nearest_rapper)
             -- move up/left 
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('a') then
-                self:moveUp()
-                self:moveLeft()
+                self:move_up()
+                self:move_left()
             -- move up/right
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('d') then
-                self:moveUp()
-                self:moveRight()
+                self:move_up()
+                self:move_right()
             -- move down/left
             elseif love.keyboard.isDown('s') and love.keyboard.isDown('a') then
-                self:moveDown()
-                self:moveLeft()
+                self:move_down()
+                self:move_left()
             -- move down/right
             elseif love.keyboard.isDown('s') and love.keyboard.isDown('d') then
-                self:moveDown()
-                self:moveRight()
+                self:move_down()
+                self:move_right()
             elseif love.keyboard.isDown('a') then
-                self:moveLeft()
+                self:move_left()
             elseif love.keyboard.isDown('d') then
-                self:moveRight()
+                self:move_right()
             elseif love.keyboard.isDown('w') then
-                self:moveUp()
+                self:move_up()
             elseif love.keyboard.isDown('s') then
-                self:moveDown()
+                self:move_down()
             else
                 self.state = 'idle'
                 self.animation = self.animations['idle']
@@ -116,66 +116,63 @@ function Player:init(map)
     }
 end
 
-function Player:moveUp()
+function Player:move_up()
     self.dy = -MOVE_SPEED
 end 
 
-function Player:moveDown()
+function Player:move_down()
     self.dy = MOVE_SPEED
 end 
 
-function Player:moveRight()
+function Player:move_right()
     self.dx = MOVE_SPEED
     self.direction = 'right'
 end 
 
-function Player:moveLeft()
+function Player:move_left()
     self.dx = -MOVE_SPEED
     self.direction = 'left'
 end 
 
-function Player:getNearestCollisionCoords()
-    rapperL = self.nearestRapper.x - HITBOX_X_OFFSET
-    rapperR = self.nearestRapper.x + self.nearestRapper.width + HITBOX_X_OFFSET
-    rapperTop = self.nearestRapper.y - HITBOX_Y_OFFSET
-    rapperBot = self.nearestRapper.y + self.nearestRapper.height + HITBOX_Y_OFFSET
+function Player:rapper_collision(x, y, rapper)
+    local rapper_left_edge = rapper.left_edge - HITBOX_X_OFFSET
+    local rapper_right_edge = rapper.right_edge + HITBOX_X_OFFSET
+    local rapper_top_edge = rapper.top_edge - HITBOX_Y_OFFSET
+    local rapper_bottom_edge = rapper.bottom_edge + HITBOX_Y_OFFSET
+    return  x < rapper_right_edge and 
+            x + self.width > rapper_left_edge and 
+            y < rapper_bottom_edge and 
+            y + self.height > rapper_top_edge
 end
 
-function Player:rapperCollision(x, y)
-    self:getNearestCollisionCoords()
-    return  x < rapperR and 
-            x + self.width > rapperL and 
-            y < rapperBot and 
-            y + self.height > rapperTop
-end
-
-function Player:wallCollision(x, y)
+function Player:wall_collision(x, y)
     return  x < HITBOX_X_OFFSET or
-            x + self.width > self.map.mapWidthPixels - HITBOX_X_OFFSET or 
+            x + self.width > self.map.width - HITBOX_X_OFFSET or 
             y < HITBOX_Y_OFFSET or 
-            y + self.height > self.map.mapHeightPixels - HITBOX_Y_OFFSET
+            y + self.height > self.map.height - HITBOX_Y_OFFSET
 end
 
 function Player:collision(x, y)
-    return self:wallCollision(x, y) or self:rapperCollision(x, y)
+    return self:wall_collision(x, y) or self:rapper_collision(x, y, self.nearest_rapper)
 end
 
 function Player:move(dt)
-    old_x = self.x 
-    old_y = self.y 
-    new_x = self.x + self.dx * dt
-    new_y = self.y + self.dy * dt
+    local old_x = self.x 
+    local old_y = self.y
+    local new_x = self.x + self.dx * dt
+    local new_y = self.y + self.dy * dt
 
     -- is there a collision? 
     if self:collision(new_x, new_y) then
         -- if we collided with a rapper, touch them
-        if self:rapperCollision(new_x, new_y) then self:touchRapper() end
+        if self:rapper_collision(new_x, new_y, self.nearest_rapper) then self:touch_rapper() end
         
+        -- move to an available position
         self.x, self.y = self:get_available_position(old_x, old_y, new_x, new_y)
     -- no collision, move to new spot
     else
         self.x, self.y = new_x, new_y 
-    end 
+    end
 end
 
 -- if we can move our position horizontally or vertically only without a collision, return that position
@@ -190,60 +187,61 @@ function Player:get_available_position(old_x, old_y, new_x, new_y)
     end 
 end 
 
-function Player:touchRapper()
-    if self.nearestRapper.status == 'hidden' then
-        self.nearestRapper:touched(self.attempts)
+-- if this is the first time we've touched this rapper then reveal them and increment attempts by 1
+function Player:touch_rapper()
+    if self.nearest_rapper.status == 'hidden' then
+        self.nearest_rapper:touched(self.attempts)
         self.attempts = self.attempts + 1
     end
 end
 
--- returns the number of nearest rapper to the player
--- updated to return the Rapper Object itself
-function Player:findNearestRapper()
-    local nearestRapper = nil
+-- returns the nearest Rapper object
+function Player:find_nearest_rapper()
+    local nearest_rapper = nil
     local distance = nil
-    for i = 1, table.getn(self.map.Rappers) do
-        local current_distance = distanceFrom(self.x, self.y, self.map.Rappers[i].middlex, self.map.Rappers[i].middley)
+    for i = 1, table.getn(self.map.rappers) do
+        local current_distance = distance_from(self.x, self.y, self.map.rappers[i].middlex, self.map.rappers[i].middley)
         if distance == nil then
             distance = current_distance
-            nearestRapper = self.map.Rappers[i]
+            nearest_rapper = self.map.rappers[i]
         elseif current_distance < distance then
             distance = current_distance
-            nearestRapper = self.map.Rappers[i]
+            nearest_rapper = self.map.rappers[i]
         end
     end
-    return nearestRapper
+    return nearest_rapper
 end
 
 -- plays an audio track corresponding to the nearest rapper
 -- will not play the last track played (or currently playing track)
-function Player:playAudio(rapper)
+function Player:play_audio(rapper)
     love.audio.stop()
-    newTrack = rapper.audio[math.random(rapper.total_verses)]
-    while newTrack == self.currentTrack do
-        newTrack = rapper.audio[math.random(rapper.total_verses)]
+    local new_track = rapper.audio[math.random(rapper.total_verses)]
+    while new_track == self.current_track do
+        new_track = rapper.audio[math.random(rapper.total_verses)]
     end
-    self.currentTrack = newTrack
-    self.currentTrack:play()
+    self.current_track = new_track
+    self.current_track:play()
 end
 
 function Player:update(dt)
-    self.nearestRapper = self:findNearestRapper()
+    self.nearest_rapper = self:find_nearest_rapper()
     self.behaviors[self.state](dt)
     self.animation:update(dt)
     self:move(dt)
 end
 
 function Player:render()
+    local scale_x = nil 
     if self.direction == 'right' then
-        scaleX = 1 * PLAYER_UPSCALE
+        scale_x = 1 * PLAYER_UPSCALE
     else
-        scaleX = -1 * PLAYER_UPSCALE
+        scale_x = -1 * PLAYER_UPSCALE
     end
 
     love.graphics.draw(self.texture, self.animation:getCurrentFrame(), 
         math.floor(self.x + self.width / 2), math.floor(self.y + self.height / 2),
-        0, scaleX, PLAYER_UPSCALE,
+        0, scale_x, PLAYER_UPSCALE,
         -- origin point for sprite
         self.width / 2, self.height / 2)
 end

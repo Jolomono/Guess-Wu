@@ -3,6 +3,8 @@ Rapper = Class{}
 AUDIO_ICON = make_image('graphics/now_playing2.png')
 HIDDEN_TEXTURE = make_image('graphics/hidden.png')
 HIDDEN_SELECTED_TEXTURE = make_image('graphics/hidden2.png')
+NAMEPLATE_FONT = love.graphics.newFont("/fonts/shiny eyes.otf", 44)
+    
 
 TEXTURES = { 
     ["RZA"] = { ["texture"] = make_image('graphics/rza.png'),
@@ -53,7 +55,7 @@ function Rapper:init(map, name, number)
     -- status 'revealed' 'hidden'
     self.status = 'hidden'
 
-    -- number for the rapper, I'm thinking four total, this will determine his location
+    -- number for the rapper, this will determine his location
     self.number = number
 
     -- height and width of image
@@ -68,36 +70,37 @@ function Rapper:init(map, name, number)
 
     -- location for sprite
     if self.number == 1 then
-        self.x = math.random(50, map.mapWidthPixels / 2 - self.width - 50)
-        self.y = math.random(50, map.mapHeightPixels / 2 - self.height - 50)
+        self.x = math.random(50, map.width / 2 - self.width - 50)
+        self.y = math.random(50, map.height / 2 - self.height - 50)
     elseif self.number == 2 then
-        self.x = math.random(map.mapWidthPixels / 2 + 50, map.mapWidthPixels - self.width - 50)
-        self.y = math.random(50, map.mapHeightPixels / 2 - self.height - 50)
+        self.x = math.random(map.width / 2 + 50, map.width - self.width - 50)
+        self.y = math.random(50, map.height / 2 - self.height - 50)
     elseif self.number == 3 then
-        self.x = math.random(map.mapWidthPixels / 2 + 50, map.mapWidthPixels - self.width - 50)
-        self.y = math.random(map.mapHeightPixels / 2 + 50, map.mapHeightPixels - self.height - 50)
+        self.x = math.random(map.width / 2 + 50, map.width - self.width - 50)
+        self.y = math.random(map.height / 2 + 50, map.height - self.height - 50)
     else 
-        self.x = math.random(50, map.mapWidthPixels / 2 - self.width - 50)
-        self.y = math.random(map.mapHeightPixels / 2 + 50, map.mapHeightPixels - self.height - 50)
+        self.x = math.random(50, map.width / 2 - self.width - 50)
+        self.y = math.random(map.height / 2 + 50, map.height - self.height - 50)
     end
 
     self.middlex = self.x + self.width / 2
     self.middley = self.y + self.height / 2
+
+    self.left_edge = self.x 
+    self.right_edge = self.x + self.width 
+    self.top_edge = self.y 
+    self.bottom_edge = self.y + self.height
     
     -- texture file setup
     self.texture = TEXTURES[name]["texture"]
-    self.selectedtexture = TEXTURES[name]["selected"]
+    self.selected_texture = TEXTURES[name]["selected"]
 
     -- verses audio table setup
     -- this is on a separate file because of how many audio files there are
-    self.audio = setupAudio(self.name)
+    self.audio = setup_audio(self.name)
     
     -- number of verses in the rapper's audio table
     self.total_verses = table.getn(self.audio)
-    
-    -- font 
-    nameplatefont = love.graphics.newFont("/fonts/shiny eyes.otf", 44)
-    
 end
 
 -- if a rapper has been touched, change status to 'revealed'
@@ -105,29 +108,29 @@ end
 function Rapper:touched(attempt)
     if self.status == 'hidden' then 
         self.status = 'revealed'
-        if self.name == map.selectedRapper.name then
+        if self.name == map.selected_rapper.name then
             if attempt == 1 then
-                roundScores[round] = 10
+                round_scores[round] = 10
                 score = score + 10
             elseif attempt == 2 then
-                roundScores[round] = 5
+                round_scores[round] = 5
                 score = score + 5
             elseif attempt == 3 then
-                roundScores[round] = 3
+                round_scores[round] = 3
                 score = score + 3
             else
-                roundScores[round] = 0
+                round_scores[round] = 0
                 score = score + 0
             end
-            if map.player.currentTrack ~= nil then
-                map.player.currentTrack:stop()
+            if map.player.current_track ~= nil then
+                map.player.current_track:stop()
             end
             
             map.player.sounds['correct']:play()
-            gameState = "RoundOver"
+            game_state = "Round Over"
         else
-            if map.player.currentTrack ~= nil then
-                map.player.currentTrack:stop()
+            if map.player.current_track ~= nil then
+                map.player.current_track:stop()
             end
     
             map.player.sounds['wrong']:play()
@@ -141,15 +144,15 @@ function Rapper:update()
         self.nameplate = self.name
     end
 
-    if map.player.nearestRapper == self then
-         self.selected = true 
+    if map.player.nearest_rapper == self then
+        self.selected = true 
     else
-         self.selected = false
+        self.selected = false
     end
 end
 
 function Rapper:render()
-    love.graphics.setFont(nameplatefont)
+    love.graphics.setFont(NAMEPLATE_FONT)
     love.graphics.printf(self.nameplate, self.x - 50, self.y + self.height, self.width + 100, "center")
 
     if self.playing then 
@@ -159,9 +162,9 @@ function Rapper:render()
     
     -- determines what to draw to the screen for each rapper based on the status
     -- if the rapper is revealed their picture should show up in Audio Only mode or Normal mode
-    if self.status == 'revealed' or gameMode == 'Normal' then
+    if self.status == 'revealed' or game_mode == 'Normal' then
         if self.selected then
-            love.graphics.draw(self.selectedtexture, self.x, self.y, 0, 1, 1)
+            love.graphics.draw(self.selected_texture, self.x, self.y, 0, 1, 1)
         else
             love.graphics.draw(self.texture, self.x, self.y, 0, 1, 1)
         end
