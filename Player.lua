@@ -1,7 +1,7 @@
 Player = Class{}
 
-require 'Animation'
-require 'Util'
+require 'animation'
+require 'util'
 
 local MOVE_SPEED = 600
 local PLAYER_UPSCALE = 3
@@ -22,9 +22,7 @@ function Player:init(map)
 
     self.nearest_rapper = nil
 
-    self.currently_playing = nil 
-
-    self.current_track = nil
+    self.currently_playing = nil
 
     self.attempts = 1
 
@@ -65,7 +63,7 @@ function Player:init(map)
         ['idle'] = function()
             -- play audio
             if love.keyboard.wasPressed('space') then
-                self:play_audio(self.nearest_rapper)
+                self.nearest_rapper:play_audio()
                 self:set_currently_playing(self.nearest_rapper)
             end 
             
@@ -80,7 +78,7 @@ function Player:init(map)
         end, 
         ['walking'] = function()
             if love.keyboard.wasPressed('space') then
-                self:play_audio(self.nearest_rapper)
+                self.nearest_rapper:play_audio()
                 self:set_currently_playing(self.nearest_rapper)
             -- move up/left 
             elseif love.keyboard.isDown('w') and love.keyboard.isDown('a') then
@@ -210,18 +208,6 @@ function Player:find_nearest_rapper()
         end
     end
     return nearest_rapper
-end
-
--- plays an audio track corresponding to the nearest rapper
--- will not play the last track played (or currently playing track)
-function Player:play_audio(rapper)
-    love.audio.stop()
-    local new_track = rapper.audio[math.random(rapper.total_verses)]
-    while new_track == self.current_track do
-        new_track = rapper.audio[math.random(rapper.total_verses)]
-    end
-    self.current_track = new_track
-    self.current_track:play()
 end
 
 function Player:update(dt)

@@ -38,3 +38,22 @@ end
 function make_audio(filename)
     return love.audio.newSource(filename,'stream')
 end
+
+-- makes a table of audio files provided that the audio files are numbered in the range 1 to total_tracks in the folder "path"
+function make_audio_table(path, total_tracks)
+    local audio_table = {}
+    for i = 1, total_tracks do 
+        local full_path = string.format("%s%s.mp3", path, i)
+        table.insert(audio_table, make_audio(full_path))
+    end 
+    return audio_table
+end
+
+-- shuffles a table argument, this is a destructive action, the original table order is not preserved
+function shuffle_table(tbl)
+    for i = #tbl, 2, -1 do
+        local j = math.random(i)
+        tbl[i], tbl[j] = tbl[j], tbl[i]
+    end
+    return tbl
+end

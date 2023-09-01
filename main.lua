@@ -167,13 +167,6 @@ function love.draw()
         end
     end
     
-    -- Used for debugging values in real time
-    -- if game_state ~= "Start" then 
-    --     love.graphics.print(map.player:collision(map.player.x, map.player.y), VIRTUAL_WIDTH / 2 - 50, 20)
-    -- end 
-    -- love.graphics.print(map.player.nearestRapperNumber, map.player.x + 30, map.player.y - 30)
-    -- love.graphics.print(map.player.collided, VIRTUAL_WIDTH / 2 - 50, 60)
-       
     -- end virtual resolution
     push:apply('end')
 end
@@ -256,10 +249,8 @@ function display_title_screen()
     love.graphics.printf("Press Enter to Play", 0, start_height, VIRTUAL_WIDTH, "center")
 
     -- how to play instructions
-    -- How to Play font
     local how_to_play_title_font = love.graphics.newFont('/fonts/unispace bd it.otf', 25)
     local how_to_play_font = love.graphics.newFont('/fonts/unispace it.otf', 25)
-
 
     color_white()
     love.graphics.setFont(how_to_play_title_font)

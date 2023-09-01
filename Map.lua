@@ -2,7 +2,6 @@ require 'util'
 require 'player'
 require 'animation'
 require 'rapper'
-require 'verses'
 
 Map = Class{}
 

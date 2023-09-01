@@ -4,44 +4,55 @@ AUDIO_ICON = make_image('graphics/now_playing2.png')
 HIDDEN_TEXTURE = make_image('graphics/hidden.png')
 HIDDEN_SELECTED_TEXTURE = make_image('graphics/hidden2.png')
 NAMEPLATE_FONT = love.graphics.newFont("/fonts/shiny eyes.otf", 44)
-    
 
-TEXTURES = { 
+RAPPER_TABLE = { 
     ["RZA"] = { ["texture"] = make_image('graphics/rza.png'),
-            ["selected"] = make_image('graphics/rza2.png')
+            ["selected"] = make_image('graphics/rza2.png'), 
+            ["audio"] = make_audio_table("/verses/rza/", 20)
     }, 
     ["GZA"] = { ["texture"] = make_image('graphics/gza.png'),
-            ["selected"] = make_image('graphics/gza2.png')
+            ["selected"] = make_image('graphics/gza2.png'),
+            ["audio"] = make_audio_table("/verses/gza/", 23)
     },
     ["Ghostface Killah"] = { ["texture"] = make_image('graphics/ghostface.png'),
-            ["selected"] = make_image('graphics/ghostface2.png')
+            ["selected"] = make_image('graphics/ghostface2.png'),
+            ["audio"] = make_audio_table("/verses/ghostface/", 29)
     },
     ["Method Man"] = { ["texture"] = make_image('graphics/methodman.png'),
-            ["selected"] = make_image('graphics/methodman2.png')
+            ["selected"] = make_image('graphics/methodman2.png'),
+            ["audio"] = make_audio_table("/verses/method_man/", 42)
     },
     ["Ol' Dirty Bastard"] = { ["texture"] = make_image('graphics/odb.png'),
-            ["selected"] = make_image('graphics/odb2.png')
+            ["selected"] = make_image('graphics/odb2.png'),
+            ["audio"] = make_audio_table("/verses/odb/", 24)
     },
     ["Raekwon"] = { ["texture"] = make_image('graphics/raekwon.png'),
-            ["selected"] = make_image('graphics/raekwon2.png')
+            ["selected"] = make_image('graphics/raekwon2.png'),
+            ["audio"] = make_audio_table("/verses/raekwon/", 24)
     },
     ["Inspectah Deck"] = { ["texture"] = make_image('graphics/inspectahdeck.png'),
-            ["selected"] = make_image('graphics/inspectahdeck2.png')
+            ["selected"] = make_image('graphics/inspectahdeck2.png'),
+            ["audio"] = make_audio_table("/verses/inspectah_deck/", 22)
     },
     ["U-God"] = { ["texture"] = make_image('graphics/u-god.png'),
-            ["selected"] = make_image('graphics/u-god2.png')
+            ["selected"] = make_image('graphics/u-god2.png'),
+            ["audio"] = make_audio_table("/verses/u-god/", 25)
     },
     ["Masta Killa"] = { ["texture"] = make_image('graphics/mastakilla.png'),
-            ["selected"] = make_image('graphics/mastakilla2.png')
+            ["selected"] = make_image('graphics/mastakilla2.png'),
+            ["audio"] = make_audio_table("/verses/masta_killa/", 28)
     },
     ["Cappadonna"] = { ["texture"] = make_image('graphics/cappadonna.png'),
-            ["selected"] = make_image('graphics/cappadonna2.png')
+            ["selected"] = make_image('graphics/cappadonna2.png'),
+            ["audio"] = make_audio_table("/verses/cappadonna/", 12)
     },
     ["David Lee Roth"] = { ["texture"] = make_image('graphics/davidleeroth.png'),
-            ["selected"] = make_image('graphics/davidleeroth2.png')
+            ["selected"] = make_image('graphics/davidleeroth2.png'),
+            ["audio"] = make_audio_table("/verses/david_lee_roth/", 33)
     },
     ["Paul Stanley"] = { ["texture"] = make_image('graphics/paulstanley.png'),
-            ["selected"] = make_image('graphics/paulstanley2.png')
+            ["selected"] = make_image('graphics/paulstanley2.png'),
+            ["audio"] = make_audio_table("/verses/paul_stanley/", 32)
     }
 }
 
@@ -92,15 +103,17 @@ function Rapper:init(map, name, number)
     self.bottom_edge = self.y + self.height
     
     -- texture file setup
-    self.texture = TEXTURES[name]["texture"]
-    self.selected_texture = TEXTURES[name]["selected"]
+    self.texture = RAPPER_TABLE[name]["texture"]
+    self.selected_texture = RAPPER_TABLE[name]["selected"]
 
-    -- verses audio table setup
-    -- this is on a separate file because of how many audio files there are
-    self.audio = setup_audio(self.name)
-    
+    -- creates a shuffled audio table 
+    self.audio = shuffle_table(RAPPER_TABLE[name]["audio"])
+                    
     -- number of verses in the rapper's audio table
     self.total_verses = table.getn(self.audio)
+
+    -- track marker, iterates after each track play to cycle through verses in table
+    self.track_num = 1
 end
 
 -- if a rapper has been touched, change status to 'revealed'
@@ -122,16 +135,12 @@ function Rapper:touched(attempt)
                 round_scores[round] = 0
                 score = score + 0
             end
-            if map.player.current_track ~= nil then
-                map.player.current_track:stop()
-            end
+            love.audio.stop()
             
             map.player.sounds['correct']:play()
             game_state = "Round Over"
         else
-            if map.player.current_track ~= nil then
-                map.player.current_track:stop()
-            end
+            love.audio.stop()
     
             map.player.sounds['wrong']:play()
         end
@@ -178,10 +187,23 @@ function Rapper:render()
     end
 end
 
+function Rapper:play_audio()
+    love.audio.stop()
+    self.audio[self.track_num]:play()
+
+    -- increment track num or reset it if we just played the last track
+    -- if LUA was zero indexed this would be simpler! 
+    if self.track_num == self.total_verses then 
+        self.track_num = 1
+    else 
+        self.track_num = self.track_num + 1
+    end 
+end
+
 function Rapper:stop_playing()
     self.playing = false
 end 
 
 function Rapper:start_playing()
     self.playing = true
-end 
+end
