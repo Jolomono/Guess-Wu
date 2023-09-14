@@ -16,9 +16,13 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 1280
 VIRTUAL_HEIGHT = 720
 
+
 function love.load()
     -- sets a more random seed to make the map generate different layouts each time
     math.randomseed(os.time())
+
+    -- sets window title
+    love.window.setTitle("Guess Wu?")
 
     -- Score tally
     score = 0
@@ -75,6 +79,8 @@ function love.keypressed(key)
     elseif game_state == 'Start' and key == 'return' then
         love.first_round()
     elseif game_state == 'Round Over' and key == 'return' then
+        -- stop any audio still playing
+        love.audio.stop()
         -- start a new round unless there have been 5 rounds
         if round < 5 then
             love.new_round()
@@ -105,14 +111,20 @@ function love.keyboard.wasPressed(key)
     return love.keyboard.keysPressed[key]
 end
 
--- just toggles the game_state from "Start" to "Round Active", the map and round are already set by love.load()
+-- toggles the game_state from "Start" to "Round Active", the map and round are already set by love.load()
 function love.first_round()
+    -- new round sound effect
+    love.audio.newSource('sounds/guitar.mp3', 'stream'):play()
+
     game_state = 'Round Active'
     map.frozen = false
 end
 
 -- sets up a new map, resets the player, creates a new prompt to follow, sets the game status to be in the Round
 function love.new_round()
+    -- new round sound effect
+    love.audio.newSource('sounds/guitar.mp3', 'stream'):play()
+
     previous_rapper = map.selected_rapper.name
     map = Map()
     game_state = 'Round Active'
@@ -130,9 +142,7 @@ function love.game_over()
     map.frozen = true
 
     -- result screen sound effect
-    local result_sound = love.audio.newSource('sounds/results.mp3', 'stream')
-
-    result_sound:play()
+    love.audio.newSource('sounds/results.mp3', 'stream'):play()
 end
 
 function love.restart()
@@ -311,6 +321,8 @@ function display_results()
 end
 
 function swap_mode(current_mode)
+    love.audio.newSource('sounds/beep.wav', 'stream'):play()
+
     if current_mode == "Normal" then 
         return "Audio Only"
     else 

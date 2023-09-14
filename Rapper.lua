@@ -79,6 +79,9 @@ function Rapper:init(map, name, number)
     -- Is this rapper currently playing audio?
     self.playing = false 
 
+    -- now playing timer, used for making the now playing icon disappear after 2.5 seconds
+    self.icon_timer = 0
+
     -- location for sprite
     if self.number == 1 then
         self.x = math.random(50, map.width / 2 - self.width - 50)
@@ -94,9 +97,11 @@ function Rapper:init(map, name, number)
         self.y = math.random(map.height / 2 + 50, map.height - self.height - 50)
     end
 
+    -- middle of rapper sprite, used by Player:find_nearest_rapper()
     self.middlex = self.x + self.width / 2
     self.middley = self.y + self.height / 2
 
+    -- rapper box boundaries, used by Player:rapper_collision()
     self.left_edge = self.x 
     self.right_edge = self.x + self.width 
     self.top_edge = self.y 
@@ -153,6 +158,15 @@ function Rapper:update()
         self.nameplate = self.name
     end
 
+    if self.playing then 
+        -- this block allows the now playing icon to go away after 2.5 seconds
+        if self.icon_timer > 2.5 then 
+            self:stop_playing()
+        else 
+            self.icon_timer = self.icon_timer + love.timer.getDelta() 
+        end 
+    end 
+
     if map.player.nearest_rapper == self then
         self.selected = true 
     else
@@ -164,7 +178,7 @@ function Rapper:render()
     love.graphics.setFont(NAMEPLATE_FONT)
     love.graphics.printf(self.nameplate, self.x - 50, self.y + self.height, self.width + 100, "center")
 
-    if self.playing then 
+    if self.playing then
         love.graphics.draw(AUDIO_ICON, self.x + self.width + 10, self.y + 50, 0, 1, 1)
         love.graphics.draw(AUDIO_ICON, self.x - 10, self.y + 50, 0, -1, 1)
     end 
@@ -189,6 +203,9 @@ end
 
 function Rapper:play_audio()
     love.audio.stop()
+
+    love.audio.newSource('sounds/click.mp3', 'stream'):play()
+
     self.audio[self.track_num]:play()
 
     -- increment track num or reset it if we just played the last track
@@ -200,7 +217,9 @@ function Rapper:play_audio()
     end 
 end
 
+-- stop_playing doesn't stop the currently playing audio, it updates the self.playing status and resets the icon timer
 function Rapper:stop_playing()
+    self.icon_timer = 0
     self.playing = false
 end 
 

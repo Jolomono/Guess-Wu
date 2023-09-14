@@ -40,6 +40,10 @@ function Player:init(map)
     self.state = 'idle'
     self.direction = 'right'
 
+    
+    -- this timer is used to toggle from the playing animation back to walking or idle
+    self.play_timer = 0
+
     self.animations = {
         ['idle'] = Animation {
             texture = self.texture,
@@ -54,6 +58,13 @@ function Player:init(map)
                 self.frames[9], self.frames[10], self.frames[11]
             },
             interval = 0.15
+        },
+        ['playing'] = Animation {
+            texture = self.texture,
+            frames = {
+                self.frames[3]
+            },
+            interval = 1
         }
     }
 
@@ -63,6 +74,8 @@ function Player:init(map)
         ['idle'] = function()
             -- play audio
             if love.keyboard.wasPressed('space') then
+                self.state = 'playing'
+                self.animation = self.animations['playing']
                 self.nearest_rapper:play_audio()
                 self:set_currently_playing(self.nearest_rapper)
             end 
@@ -78,6 +91,8 @@ function Player:init(map)
         end, 
         ['walking'] = function()
             if love.keyboard.wasPressed('space') then
+                self.state = 'playing'
+                self.animation = self.animations['playing']
                 self.nearest_rapper:play_audio()
                 self:set_currently_playing(self.nearest_rapper)
             -- move up/left 
@@ -110,7 +125,55 @@ function Player:init(map)
                 self.dx = 0
                 self.dy = 0
             end 
-        end
+        end, 
+        ['playing'] = function()
+            self.play_timer = self.play_timer + love.timer.getDelta() 
+            
+            -- move up/left 
+            if love.keyboard.isDown('w') and love.keyboard.isDown('a') then
+                self:move_up()
+                self:move_left()
+            -- move up/right
+            elseif love.keyboard.isDown('w') and love.keyboard.isDown('d') then
+                self:move_up()
+                self:move_right()
+            -- move down/left
+            elseif love.keyboard.isDown('s') and love.keyboard.isDown('a') then
+                self:move_down()
+                self:move_left()
+            -- move down/right
+            elseif love.keyboard.isDown('s') and love.keyboard.isDown('d') then
+                self:move_down()
+                self:move_right()
+            elseif love.keyboard.isDown('a') then
+                self:move_left()
+            elseif love.keyboard.isDown('d') then
+                self:move_right()
+            elseif love.keyboard.isDown('w') then
+                self:move_up()
+            elseif love.keyboard.isDown('s') then
+                self:move_down()
+            else
+                self.dx = 0
+                self.dy = 0
+            end 
+            
+            -- once this timer counts up to 0.25, it resets and then toggles the animations back to either walking or idle
+            if self.play_timer > 0.25 then 
+                self.play_timer = 0
+                
+                -- if we're walking then toggle to walking animations
+                if self.dx > 0 or self.dy > 0 then 
+                    self.state = 'walking'
+                    self.animations['walking']:restart()
+                    self.animation = self.animations['walking']
+                -- otherwise toggle to idle
+                else 
+                    self.state = 'idle'
+                    self.animation = self.animations['idle']
+                end 
+            end 
+        end 
     }
 end
 
@@ -132,6 +195,7 @@ function Player:move_left()
     self.direction = 'left'
 end 
 
+-- returns true if a collision has occurred with the nearest rapper object
 function Player:rapper_collision(x, y, rapper)
     local rapper_left_edge = rapper.left_edge - HITBOX_X_OFFSET
     local rapper_right_edge = rapper.right_edge + HITBOX_X_OFFSET
@@ -143,6 +207,7 @@ function Player:rapper_collision(x, y, rapper)
             y + self.height > rapper_top_edge
 end
 
+-- returns true if player has collided with an outer wall
 function Player:wall_collision(x, y)
     return  x < HITBOX_X_OFFSET or
             x + self.width > self.map.width - HITBOX_X_OFFSET or 
@@ -150,6 +215,7 @@ function Player:wall_collision(x, y)
             y + self.height > self.map.height - HITBOX_Y_OFFSET
 end
 
+-- returns true if player has collided with a wall or rapper
 function Player:collision(x, y)
     return self:wall_collision(x, y) or self:rapper_collision(x, y, self.nearest_rapper)
 end
