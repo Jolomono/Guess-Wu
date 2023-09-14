@@ -267,7 +267,7 @@ function display_title_screen()
     love.graphics.printf("How to Play:", 0, how_to_play_height, VIRTUAL_WIDTH, "center")
 
     love.graphics.setFont(how_to_play_font)
-    love.graphics.printf("Use the ASDW keys to move and touch a rapper to select them", 0, how_to_play_height + line_spacing, VIRTUAL_WIDTH, "center")
+    love.graphics.printf("Use the WASD keys to move and touch a rapper to select them", 0, how_to_play_height + line_spacing, VIRTUAL_WIDTH, "center")
     love.graphics.printf("Press Space to play an audio clip from the highlighted rapper", 0, how_to_play_height + (2 * line_spacing), VIRTUAL_WIDTH, "center")
     love.graphics.printf("Press TAB to swap difficulty / Hard difficulty is audio only", 0, how_to_play_height + (3 * line_spacing), VIRTUAL_WIDTH, "center")
 end 
