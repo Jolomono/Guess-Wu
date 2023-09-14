@@ -13,3 +13,5 @@ random rapper placement, sound files, difficulty options, and title/result scree
 
 This game is written in LUA and uses the LÖVE 2D gaming engine (Version 11.3) which is 
 available for free here: https://love2d.org/
+
+Game Executable can be found here: https://github.com/Jolomono/Guess-Wu/releases/
