@@ -11,5 +11,5 @@ nearly everything else. The game from that course was a 2d side scrolling
 tile-based platformer. I overhauled it into a 2d overhead map game with 
 random rapper placement, sound files, difficulty options, and title/result screens.
 
-This game is written in LUA and uses the LÖVE 2D gaming engine which is 
+This game is written in LUA and uses the LÖVE 2D gaming engine (Version 11.3) which is 
 available for free here: https://love2d.org/
