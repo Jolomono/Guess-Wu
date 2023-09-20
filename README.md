@@ -16,4 +16,4 @@ available for free here: https://love2d.org/
 
 Game Executable can be found here: https://github.com/Jolomono/Guess-Wu/releases/
 
-Game Demonstration Videos can be found here: https://youtu.be/05fRa2lPiZU?si=9GNk_HqlYOvmzcFs
+Game Demonstration Videos can be found here: https://youtube.com/playlist?list=PLE5F0jzIy7Ow6Xa_UYUK0wRz7WbB4vQ9l&si=smL2yy-j5zCecUOp
