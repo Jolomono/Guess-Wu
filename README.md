@@ -1,5 +1,5 @@
 # Guess-Wu
-Can you identify members of the Wu-Tang Clan?
+Can you identify members of the Wu-Tang Clan? Do you know the Wu?
 
 A 5 Round Quiz Game where you try to identify members of the Wu Tang Clan 
 (and a few surprise guests) by appearance and audio clips.
@@ -15,3 +15,5 @@ This game is written in LUA and uses the LÖVE 2D gaming engine (Version 11.3) w
 available for free here: https://love2d.org/
 
 Game Executable can be found here: https://github.com/Jolomono/Guess-Wu/releases/
+
+Game Demonstration Videos can be found here: https://youtu.be/05fRa2lPiZU?si=9GNk_HqlYOvmzcFs
